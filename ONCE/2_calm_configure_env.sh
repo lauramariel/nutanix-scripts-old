@@ -7,9 +7,9 @@
 
 pcip="35.203.140.64"
 password='F5!2GK0NYl'
-project_name="NewProject"
+project_name="default"
 network_name="default-net"
-image_name="CentOS_7_Cloud"
+image_name="CentOS-7-x86_64-1810.qcow2"
 
 ########################
 # Set required variables
