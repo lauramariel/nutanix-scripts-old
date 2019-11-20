@@ -8,7 +8,7 @@
 ########################
 
 pcip="35.203.140.64"
-password='F5!2GK0NYl'
+password='xxxxxxxx'
 project_name="default"
 network_name="default-net" 
 

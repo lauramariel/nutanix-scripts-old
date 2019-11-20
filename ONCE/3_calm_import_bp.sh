@@ -6,7 +6,7 @@
 ########################
 
 pcip="35.203.140.64"
-password='F5!2GK0NYl'
+password='xxxxxxxx'
 project_name="default" 
 path_to_file1="/Users/laura.jordana/Documents/ONCE/MyApp.json" # location of blueprint on local machine
 path_to_file2="/Users/laura.jordana/Documents/ONCE/MyCustomApp.json" # location of blueprint on local machine
