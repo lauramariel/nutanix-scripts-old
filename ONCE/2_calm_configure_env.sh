@@ -1,6 +1,12 @@
 #!/bin/bash
 #set -x
 
+# Script to configure an existing project environment with the following:
+# CENTOS credential
+# VM configuration (2vCPU/2GB)
+# Default image
+# Default NIC
+
 ########################
 # User Defined Variables
 ########################

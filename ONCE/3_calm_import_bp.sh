@@ -1,6 +1,8 @@
 #!/bin/bash
 #set -x
 
+# Script to import blueprints to existing project
+
 ########################
 # User Defined Variables
 ########################

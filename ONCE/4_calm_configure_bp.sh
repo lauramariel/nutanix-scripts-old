@@ -1,5 +1,11 @@
 #!/bin/bash
-set -x
+#set -x
+
+# Script to configure blueprint with the following:
+# - Credential private key
+# - Mysql_password
+# - Disk image
+# - NIC
 
 ########################
 # User Defined Variables
