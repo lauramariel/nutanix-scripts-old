@@ -28,7 +28,7 @@ def get_bp_spec():
 	if bp_details.ok:
 		parsed_bp_details = json.loads(bp_details.content)
 		bp_uuid = str(parsed_bp_details["entities"][0]["metadata"]["uuid"])
-		bp_url = "https://{}:9440/api/nutanix/v3/blueprints/{}/export_json".format(PC_IP, str(bp_uuid))
+		bp_url = "https://{}:9440/api/nutanix/v3/blueprints/{}/export_json?keep_secrets=true".format(PC_IP, str(bp_uuid))
 		bp_export = requests.get(bp_url, auth=AUTH_TYPE, headers=HEADERS, data='{}', verify=False)
 	if bp_export.ok:
 		return json.loads(bp_export.content)
