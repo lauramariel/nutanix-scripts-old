@@ -9,3 +9,5 @@ The scripts do the following and can be modified to suit your needs. The purpose
 5. Submit a blueprint to the marketplace for approval
 6. Approve the blueprint
 7. Publish the blueprint to the marketplace
+
+Note: Currently working on converting all bash scripts to Python
