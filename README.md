@@ -55,6 +55,7 @@ Blueprint MyApp imported successfully
 
 3 files processed
 2 files not processed
+```
 
 ### Importing a single file
 
