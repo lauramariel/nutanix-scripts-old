@@ -2,8 +2,13 @@
 
 # calm_import_bp.py
 
+## Notes
+
+When importing from a directory, subfolders are not traversed.
+
 ## Usage
 
+```
 usage: calm_bp_import.py [-h] (-d D | -f F) -j J -p P -u U
 
 Script to import Calm blueprints automatically from a directory, or a single
@@ -17,9 +22,13 @@ optional arguments:
   -j J        Project to import to
   -p P        Prism Central IP
   -u U        Prism User
+```
 
 ## Examples
 
+### Importing multiple files that are located in a directory folder
+
+```
 $ python3 calm_bp_import.py -d ~/blueprints -j default -p 34.83.7.88 -u admin
 Password:
 ======== Not processing bp (Doesn't appear to be a JSON file) ========
@@ -46,11 +55,14 @@ Blueprint MyApp imported successfully
 
 3 files processed
 2 files not processed
-$
-$
+
+### Importing a single file
+
+```
 $ python3 calm_bp_import.py -f ~/blueprints/bp/TestApp.json -j default -p 34.83.7.88 -u admin
 Password:
 Only processing one file.
 /Users/laura.jordana/blueprints/bp/TestApp.json
 Processing file /Users/laura.jordana/blueprints/bp/TestApp.json
 Blueprint TestApp imported successfully
+```
