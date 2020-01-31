@@ -1,4 +1,8 @@
 #!/usr/local/bin/python3
+# Script to deploy files on AOS 5.11
+# Requires domain controller (AutoDC2) to be configured already
+# Author: Laura Jordana
+# Date: 1/31/2020
 
 import uuid
 import json
@@ -9,9 +13,6 @@ from requests.auth import HTTPBasicAuth
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
-# Script to deploy files
-# Requires domain controller to be configured already
 
 # User defined variables
 PE_IP =  "10.38.6.70"
