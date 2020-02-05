@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+#
 # Script to deploy files on AOS 5.11
 # Requires domain controller (AutoDC2) to be configured already
 # Author: Laura Jordana
