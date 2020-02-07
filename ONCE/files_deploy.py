@@ -16,19 +16,19 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # User defined variables
-PE_IP =  "10.38.6.70"
-PC_IP = "10.38.6.73"
-PE_AUTH_TYPE = HTTPBasicAuth("admin", 'nx2Tech265!')
-PC_AUTH_TYPE = HTTPBasicAuth("admin", 'nx2Tech265!')
+PE_IP =  "10.38.9.134"
+PC_IP = "10.38.9.137"
+PE_AUTH_TYPE = HTTPBasicAuth("admin", 'nx2Tech295!')
+PC_AUTH_TYPE = HTTPBasicAuth("admin", 'nx2Tech295!')
 SUBNET_NAME = "default-net"
 FILES_VERSION = "3.6.1.1"
-
+FILESERVER_NAME = "filesvr1"
+NTP_SERVERS = "0.pool.ntp.org"
 # Domain controller info
 AUTH_FQDN = "ntnxlab.local"
 AUTH_ADMIN_USER = "administrator@ntnxlab.local"
 AUTH_ADMIN_PASS = "nutanix/4u"
-AUTH_HOST = "10.38.6.101"
-
+AUTH_HOST = "10.38.9.149"
 
 # Set required variables
 HEADERS = {'Content-type': 'application/json'}
@@ -36,16 +36,16 @@ HEADERS = {'Content-type': 'application/json'}
 def get_subnet_uuid():
 	get_subnet_url = "https://{}:9440/api/nutanix/v3/subnets/list".format(PC_IP)
 	subnet_details = requests.post(get_subnet_url, auth=PC_AUTH_TYPE, headers=HEADERS, data='{"filter":"name=='+ SUBNET_NAME +'"}', verify=False)
-	print(subnet_details)
+	print("{} {}".format(subnet_details, get_subnet_url))
 	if subnet_details.ok:
 		parsed_subnet_details = json.loads(subnet_details.content)
 		subnet_uuid = str(parsed_subnet_details["entities"][0]["metadata"]["uuid"])
 	return subnet_uuid 
 
-def deploy_files(fileserver_name, subnet_uuid, ntp_server):
+def deploy_files(subnet_uuid):
 	url = "https://{}:9440/PrismGateway/services/rest/v1/vfilers".format(PE_IP)
 	payload = {
-	   "name": fileserver_name,
+	   "name": FILESERVER_NAME,
 	   "numCalculatedNvms":"1",
 	   "numVcpus":"4",
 	   "memoryGiB":"12",
@@ -74,7 +74,7 @@ def deploy_files(fileserver_name, subnet_uuid, ntp_server):
 	      AUTH_HOST
 	   ],
 	   "ntpServers":[
-	      ntp_server
+	      NTP_SERVERS
 	   ],
 	   "sizeGib":"1024",
 	   "version": FILES_VERSION,
@@ -102,15 +102,13 @@ def deploy_files(fileserver_name, subnet_uuid, ntp_server):
 	      "dnsUserName": AUTH_ADMIN_USER,
 	      "dnsPassword": AUTH_ADMIN_PASS
 	   },
-	   "pdName": "NTNX-"+ fileserver_name
+	   "pdName": "NTNX-"+ FILESERVER_NAME
 	}
 
 	print(json.dumps(payload))
 	resp = requests.post(url, auth=PE_AUTH_TYPE, headers=HEADERS, data=json.dumps(payload), verify=False)
-	print(resp)
+	print("{} {}".format(resp, url))
 
 if __name__=="__main__":
-	fileserver_name = "filesvr1"
 	subnet_uuid = get_subnet_uuid()
-	ntp_server = "0.pool.ntp.org"
-	deploy_files(fileserver_name, subnet_uuid, ntp_server)
+	deploy_files(subnet_uuid)
