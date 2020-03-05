@@ -8,16 +8,16 @@ set -x
 ########################
 
 # project to use
-project="testdrive02"
+project="{{gcp_project}}"
 
 # external IP of a given instance
-external_ip="34.83.7.88"
+external_ip="{{external_ip}}"
 
 # zone the instance is in
-zone="us-west1-c"
+zone="{{zone}}"
 
-# new instance name prefix
-new_instance_prefix="prismproproxy"
+# desired instance name prefix
+new_instance_prefix="{{prefix}}"
 
 # disk image to use
 disk_image="ubuntu-minimal-1604-xenial-v20191217"  # get image list from gcloud compute images list

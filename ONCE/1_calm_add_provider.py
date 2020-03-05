@@ -13,10 +13,10 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 # Script to add Nutanix provider to an existing Calm project using a specified subnet
 
 # User defined variables
-PC_IP =  "35.203.140.64"
-AUTH_TYPE = HTTPBasicAuth("admin", 'password')
-PROJECT_NAME = "test3"
-SUBNET_NAME = "default-net"
+PC_IP =  "{{pc_ip}}"
+AUTH_TYPE = HTTPBasicAuth("admin", '{{pc_password}}')
+PROJECT_NAME = "{{project_name}}"
+SUBNET_NAME = "{{subnet_name}}"
 
 # Set required variables
 HEADERS = {'Content-type': 'application/json'}

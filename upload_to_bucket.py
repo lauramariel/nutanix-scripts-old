@@ -13,11 +13,11 @@ warnings.filterwarnings("ignore")
 # This script uploads all files in a given directory as objects to the specified bucket
 
 ### user defined variables ###
-endpoint_ip = "10.42.242.81" #Replace this value
-access_key_id = "7OKXhJe-_QXdfe9NegeUEj32c9vUQzyx"
-secret_access_key = "CRN4DBysKr_LZk9CaKXsLL449ydC5hE6"
-bucket = "archives"
-name_of_dir = "sample-files"
+endpoint_ip = "{{s3_endpoint}}"
+access_key_id = "{{access_key}}"
+secret_access_key = "{{secret_key}}"
+bucket = "{{s3_bucket_name}}"
+name_of_dir = "{{local_directory}}" # local dir to read from
 
 # concatenate full endpoint URL
 endpoint_url = "https://"+endpoint_ip+":443"

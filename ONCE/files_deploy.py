@@ -16,19 +16,19 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # User defined variables
-PE_IP =  "10.38.9.134"
-PC_IP = "10.38.9.137"
-PE_AUTH_TYPE = HTTPBasicAuth("admin", 'nx2Tech295!')
-PC_AUTH_TYPE = HTTPBasicAuth("admin", 'nx2Tech295!')
+PE_IP =  "{{pe_ip}}"
+PC_IP = "{{pc_ip}}"
+PE_AUTH_TYPE = HTTPBasicAuth("admin", '{{pe_password}}')
+PC_AUTH_TYPE = HTTPBasicAuth("admin", '{{pc_password}}')
 SUBNET_NAME = "default-net"
 FILES_VERSION = "3.6.1.1"
 FILESERVER_NAME = "filesvr1"
-NTP_SERVERS = "0.pool.ntp.org"
+NTP_SERVERS = "{{{ntp_server}}"
 # Domain controller info
-AUTH_FQDN = "ntnxlab.local"
-AUTH_ADMIN_USER = "administrator@ntnxlab.local"
-AUTH_ADMIN_PASS = "nutanix/4u"
-AUTH_HOST = "10.38.9.149"
+AUTH_FQDN = "{{domain}}"
+AUTH_ADMIN_USER = "{{ad_user}}"
+AUTH_ADMIN_PASS = "{{ad_password}}"
+AUTH_HOST = "{{ad_ip}}"
 
 # Set required variables
 HEADERS = {'Content-type': 'application/json'}
