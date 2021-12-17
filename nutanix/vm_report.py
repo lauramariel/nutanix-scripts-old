@@ -289,6 +289,7 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
 
             if metric_results.get("statsSpecificResponses"):
                 for i in metric_results["statsSpecificResponses"]:
+                    message = i["message"]
                     num_of_values = len(i["values"])
                     if num_of_values > 0:
                         max_value = int(max(i["values"]))
@@ -331,6 +332,7 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
                         f.write(f"{max_value},")
                         f.write(f"{average},")
                     else:
+                        logger.warning(message)
                         max_value = 0
                         average = 0
                         f.write("0,0,")
