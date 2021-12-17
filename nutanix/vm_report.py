@@ -184,6 +184,7 @@ def get_cluster_name(pe_ip, pe_user, pe_password):
 
 def main(pe_ip, pe_user, pe_password, report_name, duration):
 
+    log_delimiter = "==========================================="
     cluster_name = get_cluster_name(pe_ip, pe_user, pe_password)
 
     if not report_name:
@@ -203,7 +204,7 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
     logger = custom_log(cluster_name)
     logger.info(f"Report being written to {filename}")
     logger.info(f"{url}")
-    logger.info("===========================================")
+    logger.info(log_delimiter)
 
     resp = api_request(url, pe_ip, pe_user, pe_password)
     results = resp.json
@@ -272,7 +273,7 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
                 logger.info(f"{display_name}: {attribute_value}")
                 f.write(str(attribute_value) + ",")
 
-        logger.info("===========================================")
+        logger.info(log_delimiter)
 
         for vm_metric, display_name in metrics.items():
             # query the API for the specified duration for the specific VM and metric, then calculate the max and average
@@ -290,7 +291,7 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
             metric_results = metric_resp.json
 
             logger.info(f"{display_name}: {metric_url}")
-            logger.info("===========================================")
+            logger.info(log_delimiter)
 
             if metric_results.get("statsSpecificResponses"):
                 for i in metric_results["statsSpecificResponses"]:
@@ -333,12 +334,13 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
                             average = float("{:.2f}".format(average / 125))
                         logger.info(f"Max Value after conversion: {max_value}")
                         logger.info(f"Average Value after conversion: {average}")
-                        logger.info("===========================================")
+                        logger.info(log_delimiter)
                         f.write(f"{max_value},")
                         f.write(f"{average},")
                     else:
                         # Log a warning if no values were returned
                         logger.warning(message)
+                        logger.info(log_delimiter)
                         max_value = 0
                         average = 0
                         f.write("0,0,")
