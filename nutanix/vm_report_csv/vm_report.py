@@ -220,9 +220,9 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
 
     # this dict maps the desired attribute as obtained from the API
     # with the display name that will be used in the report
-    # clusterUuid is coming from a different call but want to be
+    # clusterUuid is coming from a different call but we want it to be
     # in the second column, so including it here as we'll loop
-    # through this later when writing to file
+    # through this later when writing to the file
     attributes = {
         "vmName": "Name",
         "clusterUuid": "Parent Cluster",
