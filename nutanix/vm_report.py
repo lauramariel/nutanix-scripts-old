@@ -187,7 +187,10 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
     cluster_name = get_cluster_name(pe_ip, pe_user, pe_password)
 
     if not report_name:
-        filename = f"{cluster_name}-vm-report-{current_time}.csv"
+        if duration:
+            filename = f"{cluster_name}-vm-report-last{duration}days-{current_time}.csv"
+        else:
+            filename = f"{cluster_name}-vm-report-{current_time}.csv"
     else:
         filename = report_name
     f = open(filename, "w")
@@ -210,6 +213,8 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
         logger.error(f"Error when parsing metadata: {e}")
         sys.exit(1)
     logger.info(f"Total VMs: {total_vms}")
+    if duration:
+        logger.info(f"Getting VM metrics for last {duration} days")
 
     # this dict maps the desired attribute as obtained from the API
     # with the display name that will be used in the report
@@ -268,14 +273,12 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
             # query the API for the specified duration for the specific VM and metric, then calculate the max and average
 
             if duration:
-                logger.info(f"Getting metrics for last {duration} days")
                 startTimeInUsecs = int(
                     (datetime.datetime.now() - datetime.timedelta(days=int(duration))).timestamp()
                     * 1000000
                 )
                 metric_url = f"{url}/{vm_uuid}/stats/?metrics={vm_metric}&startTimeInUsecs={startTimeInUsecs}"
             else:
-                logger.warning("No duration specified, getting metrics for current point in time")
                 metric_url = f"{url}/{vm_uuid}/stats/?metrics={vm_metric}"
 
             metric_resp = api_request(metric_url, pe_ip, pe_user, pe_password)
