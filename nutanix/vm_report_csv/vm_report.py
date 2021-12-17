@@ -192,7 +192,7 @@ def get_cluster_name(pe_ip, pe_user, pe_password):
 def main(pe_ip, pe_user, pe_password, report_name, duration):
     """
     Main function for the script
-    Queries the required APIs and constructs the report
+    Queries the required APIs, does the required calculations, and constructs the report
     """
     log_delimiter = "==========================================="
     cluster_name = get_cluster_name(pe_ip, pe_user, pe_password)
