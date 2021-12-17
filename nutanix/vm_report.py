@@ -213,6 +213,7 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
         logger.error(f"Error when parsing metadata: {e}")
         sys.exit(1)
     logger.info(f"Total VMs: {total_vms}")
+
     if duration:
         logger.info(f"Getting VM metrics for last {duration} days")
 
@@ -276,14 +277,14 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
         for vm_metric, display_name in metrics.items():
             # query the API for the specified duration for the specific VM and metric, then calculate the max and average
 
-            if duration:
+            if duration == 0:
+                metric_url = f"{url}/{vm_uuid}/stats/?metrics={vm_metric}"
+            else:
                 startTimeInUsecs = int(
                     (datetime.datetime.now() - datetime.timedelta(days=int(duration))).timestamp()
                     * 1000000
                 )
                 metric_url = f"{url}/{vm_uuid}/stats/?metrics={vm_metric}&startTimeInUsecs={startTimeInUsecs}"
-            else:
-                metric_url = f"{url}/{vm_uuid}/stats/?metrics={vm_metric}"
 
             metric_resp = api_request(metric_url, pe_ip, pe_user, pe_password)
             metric_results = metric_resp.json
@@ -381,7 +382,10 @@ if __name__ == "__main__":
         except Exception:
             duration = input("Please enter a valid duration in days: ")
             if not duration:
-                print("No duration specified, getting metrics for current point in time")
+                duration = 30
+                print("No duration specified, getting metrics for last 30 days")
+    else:
+        duration = 30
 
     # self.debug = True if args.debug == "enable" else False
     main(pe_ip, pe_user, pe_password, report_name, duration)
