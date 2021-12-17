@@ -79,6 +79,8 @@ By default, this script does not require a verified SSL connection to Prism Elem
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ```
 
+#### Logs
+Everything is logged to `<cluster_name>-log-<date>.log`
 #### API Calls
 
 The following API calls are used in this script:
@@ -104,3 +106,13 @@ This script was tested and verified working against:
 * AOS 5.10.3.2
 * AOS 5.20.1.1
 * AOS 6.0.2
+
+### Screenshots
+
+Sample Log File
+
+![](./screenshots/sample_log.png)
+
+Sample Report Output
+
+![](./screenshots/sample_report.png)
