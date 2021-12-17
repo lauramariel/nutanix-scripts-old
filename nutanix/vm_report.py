@@ -10,6 +10,7 @@ import sys
 import logging
 import argparse
 import getpass
+import re
 from base64 import b64encode
 from requests.auth import HTTPBasicAuth
 
@@ -129,11 +130,11 @@ class NameFilter(logging.Filter):
     """
     Class to contextually change the log based on the VM being processed
     """
-    def __init__(self, vm_name):
-        self.vm_name = vm_name
+    def __init__(self, entity_name):
+        self.entity_name = entity_name
 
     def filter(self, record):
-        record.vm_name = self.vm_name
+        record.entity_name = self.entity_name
         return True
 
 def api_request(url, pe_ip, pe_user, pe_password):
@@ -150,17 +151,20 @@ def api_request(url, pe_ip, pe_user, pe_password):
 
     return resp
 
-def custom_log(vm_name):
+def custom_log(entity_name):
     """
-    Custom log to include current VM name being processed
+    Custom log to include current entity name being processed
     """
     logger = logging.getLogger(__name__)
-    logger.addFilter(NameFilter(vm_name))
-    filelog = logging.FileHandler(filename=f"vm_report-log-{current_time}.log")
-    formatter = logging.Formatter("%(levelname).1s %(asctime)s [%(vm_name)s] %(message)s")
-    filelog.setFormatter(formatter)
-    logger.setLevel(logging.INFO)
+    logger.addFilter(NameFilter(entity_name))
+
     if not logger.hasHandlers():
+        logname = f"{entity_name}-log-{current_time}.log"
+        filelog = logging.FileHandler(filename=logname)
+        formatter = logging.Formatter("%(levelname).1s %(asctime)s [%(entity_name)s] %(message)s")
+        filelog.setFormatter(formatter)
+        logger.setLevel(logging.INFO)
+        print(f"Logging to {logname}")
         logger.addHandler(filelog)
     return logger
 
@@ -179,22 +183,33 @@ def get_cluster_name(pe_ip, pe_user, pe_password):
     return cluster_name
 
 def main(pe_ip, pe_user, pe_password, report_name, duration):
-    content_type = "application/json"
-    headers = {"Content-type": f"{content_type}"}
+
+    cluster_name = get_cluster_name(pe_ip, pe_user, pe_password)
+
     if not report_name:
-        filename = f"vm_report-{current_time}.csv"
+        filename = f"{cluster_name}-vm-report-{current_time}.csv"
     else:
         filename = report_name
     f = open(filename, "w")
 
     # URL for Stats of All VM Stats
     url = f"https://{pe_ip}:9440/PrismGateway/services/rest/v1/vms"
-    logger = custom_log("")
+
+    # remove any whitespace from cluster_name as it will be used in the log filename
+    cluster_name = re.sub(r"\s+", '-', cluster_name)
+    logger = custom_log(cluster_name)
+    logger.info(f"Report being written to {filename}")
     logger.info(f"{url}")
     logger.info("===========================================")
 
     resp = api_request(url, pe_ip, pe_user, pe_password)
     results = resp.json
+    try:
+        total_vms = results.get('metadata', {}).get('grandTotalEntities')
+    except Exception as e:
+        logger.error(f"Error when parsing metadata: {e}")
+        sys.exit(1)
+    logger.info(f"Total VMs: {total_vms}")
 
     # this dict maps the desired attribute as obtained from the API
     # with the display name that will be used in the report
@@ -231,13 +246,12 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
 
     # Content
     for vm in results["entities"]:
-        logger = custom_log(vm["vmName"])
+        vm_name = vm["vmName"]
+        logger = custom_log(vm_name)
         vm_uuid = vm["uuid"]
  
         for attr in attributes:
             if attr == "clusterUuid":
-                # get the Cluster Name
-                cluster_name = get_cluster_name(pe_ip, pe_user, pe_password)
                 f.write(f"{cluster_name}" + ",")
             elif "Bytes" in attr:
                 # 1073741824 bytes = 1 GiB
@@ -256,7 +270,7 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
             if duration:
                 logger.info(f"Getting metrics for last {duration} days")
                 startTimeInUsecs = int(
-                    (datetime.datetime.now() - datetime.timedelta(days=duration)).timestamp()
+                    (datetime.datetime.now() - datetime.timedelta(days=int(duration))).timestamp()
                     * 1000000
                 )
                 metric_url = f"{url}/{vm_uuid}/stats/?metrics={vm_metric}&startTimeInUsecs={startTimeInUsecs}"
@@ -266,56 +280,59 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
 
             metric_resp = api_request(metric_url, pe_ip, pe_user, pe_password)
             metric_results = metric_resp.json
+
             logger.info(f"{display_name}: {metric_url}")
             logger.info("===========================================")
 
-            for i in metric_results["statsSpecificResponses"]:
-                num_of_values = len(i["values"])
-                if num_of_values > 0:
-                    max_value = int(max(i["values"]))
-                    average = int(float(sum(i["values"]) / num_of_values))
+            if metric_results.get("statsSpecificResponses"):
+                for i in metric_results["statsSpecificResponses"]:
+                    num_of_values = len(i["values"])
+                    if num_of_values > 0:
+                        max_value = int(max(i["values"]))
+                        average = int(float(sum(i["values"]) / num_of_values))
 
-                    logger.info(f"Length of value list: {num_of_values}")
-                    logger.info(f"Max Value in value list: {max_value}")
-                    logger.info(f"Average Value in value list: {average}")
+                        logger.info(f"Length of value list: {num_of_values}")
+                        logger.info(f"Max Value in value list: {max_value}")
+                        logger.info(f"Average Value in value list: {average}")
 
-                    if "controller_user_bytes" in vm_metric:
-                        # For Disk Usage report as a %, so need to divide
-                        # by total capacity
-                        total_disk_cap = vm.get("diskCapacityInBytes")
-                        if total_disk_cap:
-                            # print("total_disk_cap: " + str(total_disk_cap))
-                            max_value = float(
-                                "{:.2f}".format((max_value / total_disk_cap) * 100)
-                            )
-                            average = float(
-                                "{:.2f}".format((average / total_disk_cap) * 100)
-                            )
-                        else:
-                            max_value = 0
-                            average = 0
-                    elif "ppm" in vm_metric:
-                        # reported in parts per million, divide by 1e6 and multiply by 100 to get %
-                        max_value = float("{:.2f}".format((max_value / 1000000) * 100))
-                        average = float("{:.2f}".format((average / 1000000) * 100))
-                    elif "memory_usage_bytes" in vm_metric:
-                        # convert bytes to GiB - divide by 1073741824
-                        max_value = float("{:.2f}".format(max_value / 1073741824))
-                        average = float("{:.2f}".format(average / 1073741824))
-                    elif "hypervisor_num" in vm_metric:
-                        # convert bytes to kilobits - divide by 125
-                        max_value = float("{:.2f}".format(max_value / 125))
-                        average = float("{:.2f}".format(average / 125))
-                    logger.info(f"Max Value after conversion: {max_value}")
-                    logger.info(f"Average Value after conversion: {average}")
-                    logger.info("===========================================")
-                    f.write(f"{max_value},")
-                    f.write(f"{average},")
-                else:
-                    max_value = 0
-                    average = 0
-                    f.write("0,0,")
-
+                        if "controller_user_bytes" in vm_metric:
+                            # For Disk Usage report as a %, so need to divide
+                            # by total capacity
+                            total_disk_cap = vm.get("diskCapacityInBytes")
+                            if total_disk_cap:
+                                # print("total_disk_cap: " + str(total_disk_cap))
+                                max_value = float(
+                                    "{:.2f}".format((max_value / total_disk_cap) * 100)
+                                )
+                                average = float(
+                                    "{:.2f}".format((average / total_disk_cap) * 100)
+                                )
+                            else:
+                                max_value = 0
+                                average = 0
+                        elif "ppm" in vm_metric:
+                            # reported in parts per million, divide by 1e6 and multiply by 100 to get %
+                            max_value = float("{:.2f}".format((max_value / 1000000) * 100))
+                            average = float("{:.2f}".format((average / 1000000) * 100))
+                        elif "memory_usage_bytes" in vm_metric:
+                            # convert bytes to GiB - divide by 1073741824
+                            max_value = float("{:.2f}".format(max_value / 1073741824))
+                            average = float("{:.2f}".format(average / 1073741824))
+                        elif "hypervisor_num" in vm_metric:
+                            # convert bytes to kilobits - divide by 125
+                            max_value = float("{:.2f}".format(max_value / 125))
+                            average = float("{:.2f}".format(average / 125))
+                        logger.info(f"Max Value after conversion: {max_value}")
+                        logger.info(f"Average Value after conversion: {average}")
+                        logger.info("===========================================")
+                        f.write(f"{max_value},")
+                        f.write(f"{average},")
+                    else:
+                        max_value = 0
+                        average = 0
+                        f.write("0,0,")
+            else:
+                logger.error(f"Error fetching stat details for {vm_name}")
         f.write("\n")
 
     f.close()
@@ -345,7 +362,16 @@ if __name__ == "__main__":
 
     # optional arguments
     report_name = args.filename
+
     duration = args.duration
+
+    if duration:
+        try:
+            duration = int(duration)
+        except Exception:
+            duration = input("Please enter a valid duration in days: ")
+            if not duration:
+                print("No duration specified, getting metrics for current point in time")
 
     # self.debug = True if args.debug == "enable" else False
     main(pe_ip, pe_user, pe_password, report_name, duration)
