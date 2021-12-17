@@ -73,6 +73,8 @@ python3 ./vm_report.py <Prism_Element_IP> -u <username> -p <password> -d 60 -f m
 The above will gather data for the last 60 days and write to file `myreport.csv`
 
 ### Additional Info
+
+### SSL connections
 By default, this script does not require a verified SSL connection to Prism Element. If you have configured Prism Element with a valid SSL certificate and require SSL certificate verification in your environment, please comment the following line:
 
 ```
