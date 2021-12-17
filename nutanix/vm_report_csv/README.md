@@ -1,4 +1,4 @@
-## Custom VM Stats Report in CSV
+# Custom VM Stats Report in CSV
 
 This script generates a CSV report based on VM statistics in the V1 API, which is accessed via Prism Element. It creates a report with the following columns:
 
@@ -22,7 +22,7 @@ This script generates a CSV report based on VM statistics in the V1 API, which i
 
 By default, it will generate a report based on the last 30 days. The `-d` flag can be used to specify a duration in days (which can be `0` if you want a current point-in-time report)
 
-### Setup
+## Setup
 
 * Recommend Python version 3.7 or later. Testing for this script was done with Python 3.7.11 on Mac OS X Catalina.
 * Create an activate a virtual environment:
@@ -37,7 +37,7 @@ python3 -m venv venv
 pip3 install -r requirements.txt
 ```
 
-### Usage
+## Usage
 ```
 usage: vm_report.py [-h] [-u USERNAME] [-p PASSWORD] [-d DURATION]
                     [-f FILENAME]
@@ -58,7 +58,7 @@ optional arguments:
                         Desired report filename
 ```
 
-#### Example Usage
+### Example Usage
 
 ```
 python3 ./vm_report.py <Prism_Element_IP> -u <username> -p <password>
@@ -72,7 +72,7 @@ python3 ./vm_report.py <Prism_Element_IP> -u <username> -p <password> -d 60 -f m
 ```
 The above will gather data for the last 60 days and write to file `myreport.csv`
 
-### Additional Info
+## Additional Info
 
 ### SSL connections
 By default, this script does not require a verified SSL connection to Prism Element. If you have configured Prism Element with a valid SSL certificate and require SSL certificate verification in your environment, please comment the following line:
@@ -81,9 +81,9 @@ By default, this script does not require a verified SSL connection to Prism Elem
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ```
 
-#### Logs
+### Logs
 Everything is logged to `<cluster_name>-log-<date>.log`
-#### API Calls
+### API Calls
 
 The following API calls are used in this script:
 
@@ -95,13 +95,13 @@ GET https://{pe_ip}:9440/PrismGateway/services/rest/v1/vms/stats/?metrics={vm_me
 
 For more information, take a look at this blog post: https://www.nutanix.dev/2019/09/23/getting-vm-performance-metrics-via-api/
 
-#### Attribute and Metric Configuration
+### Attribute and Metric Configuration
 
 The defined attributes and metrics are found in config.json, and mapped to a desired display name.
 
 For additional attributes and metrics, please use `https://{pe_ip}:9440/PrismGateway/services/rest/v1/vms` to see a full list of attributes and metrics that can be queried.
 
-#### Supported AOS versions
+### Supported AOS versions
 
 This script was tested and verified working against:
 
@@ -109,7 +109,7 @@ This script was tested and verified working against:
 * AOS 5.20.1.1
 * AOS 6.0.2
 
-### Screenshots
+## Screenshots
 
 Sample Log File
 
@@ -118,3 +118,7 @@ Sample Log File
 Sample Report Output
 
 ![](./screenshots/sample_report.png)
+
+## Disclaimer
+
+Please see the .disclaimer file that is distributed with this repository.
