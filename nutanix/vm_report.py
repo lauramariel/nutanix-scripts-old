@@ -255,7 +255,7 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
         logger = custom_log(vm_name)
         vm_uuid = vm["uuid"]
  
-        for attr in attributes:
+        for attr, display_name in attributes.items():
             if attr == "clusterUuid":
                 f.write(f"{cluster_name}" + ",")
             elif "Bytes" in attr:
@@ -264,10 +264,14 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
                     value_in_gib = int(vm[f"{attr}"] / 1073741824)
                 else:
                     value_in_gib = 0
+                logger.info(f"{display_name}: {value_in_gib} GiB")
                 f.write(f"{value_in_gib} GiB,")
             else:
                 attribute_value = vm[f"{attr}"]
+                logger.info(f"{display_name}: {attribute_value}")
                 f.write(str(attribute_value) + ",")
+
+        logger.info("===========================================")
 
         for vm_metric, display_name in metrics.items():
             # query the API for the specified duration for the specific VM and metric, then calculate the max and average
@@ -332,6 +336,7 @@ def main(pe_ip, pe_user, pe_password, report_name, duration):
                         f.write(f"{max_value},")
                         f.write(f"{average},")
                     else:
+                        # Log a warning if no values were returned
                         logger.warning(message)
                         max_value = 0
                         average = 0
