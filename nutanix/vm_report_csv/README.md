@@ -119,6 +119,10 @@ Sample Report Output
 
 ![](./screenshots/sample_report.png)
 
+## Performance Benchmark
+
+On a 14-node cluster with 375 total VMs the script took ~16 minutes to run.
+
 ## Disclaimer
 
 Please see the .disclaimer file that is distributed with this repository.
